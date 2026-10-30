@@ -1,0 +1,14 @@
+# Binarios y objetos de Code::Blocks / C++
+bin/
+obj/
+*.exe
+*.depend
+*.layout
+*.o
+*.obj
+
+# Configuración del sistema / IDE
+.vscode/
+.idea/
+*.suo
+*.user
