@@ -69,9 +69,11 @@ TPrimitiva::TPrimitiva(int DL, int t)
 
             break;
 		}
-		case EDIFICIO_ID: {  // Creación de la carretera
-		    tz = ty = 0;
-            tx = -27;
+		case EDIFICIO_ID: {  // Creación del edificio
+		    tx = 15.0;
+		    ty = -2.5;
+		    tz = 15.0;
+		    rr = 0.0;
 
             memcpy(colores, coloresr_c, 8*sizeof(float));
 
@@ -82,9 +84,8 @@ TPrimitiva::TPrimitiva(int DL, int t)
             break;
 		}
 		case COCHE_ID: { // Creación del coche
-
 		    tx = -2.0;
-		    ty =  0.5;
+		    ty =  0.8;
 		    tz =  0.0;
 		    rr =  0.0;
 
@@ -95,6 +96,19 @@ TPrimitiva::TPrimitiva(int DL, int t)
             modelo0 = Load3DS("../../Modelos/Carroceria.3ds", &num_vertices0);
             modelo1 = Load3DS("../../Modelos/Rueda.3ds", &num_vertices1);
             break;
+		}
+		case FAROLA_ID: { // Creación de la farola
+            tx = 0.0;
+            ty = 0.0; // La base tocará el suelo
+            tz = 0.0;
+            ry = 0.0; // Para rotarla si fuera necesario
+
+            // Color gris oscuro/metal
+            colores[0][0] = 0.3; colores[0][1] = 0.3; colores[0][2] = 0.3; colores[0][3] = 1.0;
+
+            //************************ Cargar modelos 3ds ***********************************
+            // formato 8 floats por vértice (x, y, z, A, B, C, u, v)
+            modelo0 = Load3DS("../../Modelos/Farola.3ds", &num_vertices0);
 		}
 	} // switch
 }
@@ -135,7 +149,7 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
 
             }
             break;
-        } // case CARRETERA_ID:
+        }
         case EDIFICIO_ID: {
             if (escena.show_road) {
                 // Cálculo de la ModelView
@@ -158,73 +172,63 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
             }
             break;
         }
-        // case CARRETERA_ID:
         case COCHE_ID: {
+            // 1. Matriz base: Coloca el coche y lo gira 180º para que mire hacia adelante en la carretera
+            glm::mat4 baseMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(tx, ty, tz));
+            baseMatrix = glm::rotate(baseMatrix, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
             if (escena.show_car) {
                 glUniform4fv(escena.uColorLocation, 1, (const GLfloat *) colores[0]);
                 glVertexAttribPointer(escena.aPositionLocation, POSITION_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo0);
                 glVertexAttribPointer(escena.aNormalLocation, NORMAL_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo0+3);
 
-                modelMatrix = glm::mat4(1.0f);
-                // Añadimos un +0.4 solo de la Y de la carrocería para subirla
-                modelMatrix = glm::translate(modelMatrix,glm::vec3(tx, ty + 0.4f, tz));
-                modelMatrix = glm::rotate(modelMatrix, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f)); // Endereza chasis
-
-                modelViewMatrix = escena.viewMatrix * modelMatrix;
+                glm::mat4 modelViewMatrix = escena.viewMatrix * baseMatrix;
                 glUniformMatrix4fv(escena.uMVMatrixLocation, 1, GL_FALSE, &modelViewMatrix[0][0]);
                 glDrawArrays(GL_TRIANGLES, 0, num_vertices0);
             }
 
-            if (escena.show_wheels)
-            {
+            if (escena.show_wheels) {
                 glUniform4fv(escena.uColorLocation, 1, (const GLfloat *) colores[1]);
                 glVertexAttribPointer(escena.aPositionLocation, POSITION_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo1);
                 glVertexAttribPointer(escena.aNormalLocation, NORMAL_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo1+3);
 
-                // RUEDA Delantera Izquierda
-                modelMatrix = glm::mat4(1.0f);
-                modelMatrix = glm::translate(modelMatrix, glm::vec3(tx, ty, tz));
-                modelMatrix = glm::rotate(modelMatrix, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-                modelMatrix = glm::translate(modelMatrix, glm::vec3(-0.864, -1.294, -0.15)); // <--- Altura bajada
-                modelMatrix = glm::rotate(modelMatrix, (float) glm::radians(rr), glm::vec3(1,0,0));
-                modelMatrix = glm::rotate(modelMatrix, (float) glm::radians(180.0), glm::vec3(0,0,1));
-                modelViewMatrix = escena.viewMatrix * modelMatrix;
-                glUniformMatrix4fv(escena.uMVMatrixLocation, 1, GL_FALSE, &modelViewMatrix[0][0]);
-                glDrawArrays(GL_TRIANGLES, 0, num_vertices1);
+                // Coordenadas locales de las ruedas. ¡Nota que ahora la altura Y es -0.5f para bajarlas del chasis!
+                static const float rueda[4][3] = {
+                    {-0.864f, -0.5f, -1.294f}, // delantera izquierda
+                    { 0.864f, -0.5f, -1.294f}, // delantera derecha
+                    {-0.864f, -0.5f,  1.428f}, // trasera izquierda
+                    { 0.864f, -0.5f,  1.428f}  // trasera derecha
+                };
 
-                // RUEDA Delantera Derecha
-                modelMatrix = glm::mat4(1.0f);
-                modelMatrix = glm::translate(modelMatrix, glm::vec3(tx, ty, tz));
-                modelMatrix = glm::rotate(modelMatrix, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-                modelMatrix = glm::translate(modelMatrix, glm::vec3(0.864, -1.294, -0.15)); // <--- Altura bajada
-                modelMatrix = glm::rotate(modelMatrix, (float) glm::radians(rr), glm::vec3(1,0,0));
-                modelViewMatrix = escena.viewMatrix * modelMatrix;
-                glUniformMatrix4fv(escena.uMVMatrixLocation, 1, GL_FALSE, &modelViewMatrix[0][0]);
-                glDrawArrays(GL_TRIANGLES, 0, num_vertices1);
+                for (int i = 0; i < 4; i++) {
+                    // Usamos baseMatrix para que las ruedas hereden la posición y el giro de 180º
+                    glm::mat4 modelMatrix = glm::translate(baseMatrix, glm::vec3(rueda[i][0], rueda[i][1], rueda[i][2]));
+                    modelMatrix = glm::rotate(modelMatrix, (float) glm::radians(rr), glm::vec3(1.0f, 0.0f, 0.0f));
 
-                // RUEDA Trasera Izquierda
-                modelMatrix = glm::mat4(1.0f);
-                modelMatrix = glm::translate(modelMatrix, glm::vec3(tx, ty, tz));
-                modelMatrix = glm::rotate(modelMatrix, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-                modelMatrix = glm::translate(modelMatrix, glm::vec3(-0.864, 1.428, -0.15)); // <--- Altura bajada
-                modelMatrix = glm::rotate(modelMatrix, (float) glm::radians(rr), glm::vec3(1,0,0));
-                modelMatrix = glm::rotate(modelMatrix, (float) glm::radians(180.0), glm::vec3(0,0,1));
-                modelViewMatrix = escena.viewMatrix * modelMatrix;
-                glUniformMatrix4fv(escena.uMVMatrixLocation, 1, GL_FALSE, &modelViewMatrix[0][0]);
-                glDrawArrays(GL_TRIANGLES, 0, num_vertices1);
+                    if (rueda[i][0] < 0) // Ruedas del lado izquierdo: girar llanta hacia fuera
+                        modelMatrix = glm::rotate(modelMatrix, (float) glm::radians(180.0), glm::vec3(0.0f, 0.0f, 1.0f));
 
-                // RUEDA Trasera Derecha
-                modelMatrix = glm::mat4(1.0f);
-                modelMatrix = glm::translate(modelMatrix, glm::vec3(tx, ty, tz));
-                modelMatrix = glm::rotate(modelMatrix, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-                modelMatrix = glm::translate(modelMatrix, glm::vec3(0.864, 1.428, -0.15)); // <--- Altura bajada
-                modelMatrix = glm::rotate(modelMatrix, (float) glm::radians(rr), glm::vec3(1,0,0));
-                modelViewMatrix = escena.viewMatrix * modelMatrix;
-                glUniformMatrix4fv(escena.uMVMatrixLocation, 1, GL_FALSE, &modelViewMatrix[0][0]);
-                glDrawArrays(GL_TRIANGLES, 0, num_vertices1);
+                    glm::mat4 modelViewMatrix = escena.viewMatrix * modelMatrix;
+                    glUniformMatrix4fv(escena.uMVMatrixLocation, 1, GL_FALSE, &modelViewMatrix[0][0]);
+                    glDrawArrays(GL_TRIANGLES, 0, num_vertices1);
+                }
             }
             break;
-        } // case COCHE_ID:
+        }
+        case FAROLA_ID: {
+            glUniform4fv(escena.uColorLocation, 1, (const GLfloat *) colores[0]);
+            glVertexAttribPointer(escena.aPositionLocation, POSITION_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo0);
+            glVertexAttribPointer(escena.aNormalLocation, NORMAL_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo0+3);
+
+            modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(tx, ty, tz));
+            modelMatrix = glm::rotate(modelMatrix, glm::radians(ry), glm::vec3(0.0f, 1.0f, 0.0f));
+
+            modelViewMatrix = escena.viewMatrix * modelMatrix;
+            glUniformMatrix4fv(escena.uMVMatrixLocation, 1, GL_FALSE, &modelViewMatrix[0][0]);
+            glDrawArrays(GL_TRIANGLES, 0, num_vertices0);
+            break;
+        }
+
     } // switch
 
 }
@@ -430,16 +434,45 @@ void __fastcall TEscena::Pick3D(int mouse_x, int mouse_y)
 // Crea todo el escenario
 void __fastcall TEscena::CrearEscenario()
 {
+    // ***** Instanciación de objetos *****
     TPrimitiva *road1 = new TPrimitiva(CARRETERA_ID, CARRETERA_ID);
     TPrimitiva *road2 = new TPrimitiva(CARRETERA_ID, CARRETERA_ID);
-    TPrimitiva *car1 = new TPrimitiva(1, COCHE_ID);
-    TPrimitiva *car2 = new TPrimitiva(2, COCHE_ID);
+
     TPrimitiva *edificio1 = new TPrimitiva(EDIFICIO_ID, EDIFICIO_ID);
     TPrimitiva *edificio2 = new TPrimitiva(EDIFICIO_ID, EDIFICIO_ID);
 
-    road2->tx = 0;
-    road2->tz = 16;
+    TPrimitiva *farola1 = new TPrimitiva(FAROLA_ID, FAROLA_ID);
+    TPrimitiva *farola2 = new TPrimitiva(FAROLA_ID, FAROLA_ID);
 
+    TPrimitiva *car1 = new TPrimitiva(1, COCHE_ID);
+    TPrimitiva *car2 = new TPrimitiva(2, COCHE_ID);
+
+    // ***** Configuración de carreteras *****
+    // road1 se queda en el origen por defecto
+    road2->tx = 0;
+    road2->tz = 16; // Desplazada en Z para alargar el trazado
+
+    // ***** Configuración de edificios *****
+    // Edificio 1: Posición por defecto, pero se le da un tinte verdoso
+    edificio1->colores[0][1]=0.8;
+
+    // Edificio 2: Desplazado, rotado, escalado y con tinte azulado
+    edificio2->tx = 27;
+    edificio2->ry = 180; // Gira 180 para mirar hacia la carretera
+    edificio2->sx = 2.0; // Se hace el doble de ancho en el eje X
+    edificio2->colores[0][2] = 0.8;
+
+    // ***** Configuración de farolas *****
+    farola1->tx = 4.0; // Situada en la acera derecha
+    farola1->tz = 5.0;
+
+    farola2->tx = -4.0; // Situada en la acera izquierda
+    farola2->tz = -5.0;
+
+    // ***** Configuración de coches *****
+    // Coche 1: Usa los valores del constructor por defecto (naranja, en tx=-2.0)
+
+    // Coche 2: Se cambia su color a azul y se ajusta a su posición inicial
     car2->colores[0][0] = 0.1;
     car2->colores[0][1] = 0.4;
     car2->colores[0][2] = 0.9;
@@ -447,20 +480,16 @@ void __fastcall TEscena::CrearEscenario()
     car2->tx = 2;
     car2->tz = 3;
 
-    edificio1->colores[0][1]=0.8;
-
-    edificio2->tx=27;
-    edificio2->ry=180;
-    edificio2->sx=2.0;
-    edificio2->colores[0][2]=0.8;
-
-    // Añadir objetos
+    // ***** Añadir a la escena para renderizar *****
+    // Los objetos estáticos van a la lista principal
     AddObject(road1);
     AddObject(road2);
     AddObject(edificio1);
     AddObject(edificio2);
+    AddObject(farola1);
+    AddObject(farola2);
 
-    // Añadir coches
+    // Los coches usan AddCar para gestionarlos con el selector y la cámara
     AddCar(car1);
     AddCar(car2);
 }

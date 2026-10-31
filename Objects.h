@@ -30,7 +30,7 @@
 // Identificadores internos de los objetos y el coche
 #define CARRETERA_ID    10
 #define EDIFICIO_ID     20
-#define COCHE2_ID       30
+#define FAROLA_ID       40
 
 #define COCHE_ID	    500
 
