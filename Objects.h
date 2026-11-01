@@ -36,6 +36,7 @@
 #define PISTA_ID        60
 #define PAPELERA_ID     70
 #define BANCO_ID        80
+#define SENAL_ID        90
 
 #define COCHE_ID	    500
 

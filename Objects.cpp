@@ -164,7 +164,7 @@ TPrimitiva::TPrimitiva(int DL, int t)
             modelo1 = NULL;
             break;
         }
-        case BANCO_ID: {
+        case BANCO_ID: { // Creación del banco
             tx = 0.0;
             ty = 0.0;
             tz = 0.0;
@@ -174,6 +174,19 @@ TPrimitiva::TPrimitiva(int DL, int t)
             colores[0][0] = 0.5f; colores[0][1] = 0.3f; colores[0][2] = 0.1f; colores[0][3] = 1.0f;
 
             modelo0 = Load3DS("../../Modelos/Banco.3ds", &num_vertices0);
+            modelo1 = NULL;
+            break;
+        }
+        case SENAL_ID: { // Creación de la señal
+            tx = 0.0;
+            ty = 0.0;
+            tz = 0.0;
+            ry = 0.0;
+
+            // Color gris claro/metalizado para el poste y placa
+            colores[0][0] = 0.7f; colores[0][1] = 0.7f; colores[0][2] = 0.7f; colores[0][3] = 1.0f;
+
+            modelo0 = Load3DS("../../Modelos/Senal.3ds", &num_vertices0);
             modelo1 = NULL;
             break;
         }
@@ -286,7 +299,8 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
         case FUENTE_ID:
         case PISTA_ID:
         case PAPELERA_ID:
-        case BANCO_ID: {
+        case BANCO_ID:
+        case SENAL_ID: {
             if (modelo0 == NULL) break;   // el .3ds no se cargo: no dibujar
             if (tipo == CRUCE_ID && !escena.show_road) break;   // sigue el checkbox "Dibujar Carretera"
 
@@ -541,6 +555,15 @@ static TPrimitiva *NuevoBanco(float x, float z, float giro = 0.0f)
     return b;
 }
 
+static TPrimitiva *NuevaSenal(float x, float z, float giro = 0.0f)
+{
+    TPrimitiva *s = new TPrimitiva(SENAL_ID, SENAL_ID);
+    s->tx = x;
+    s->tz = z;
+    s->ry = giro;
+    return s;
+}
+
 // Crea todo el escenario: un cruce central, 4 brazos de carretera (2 tramos cada uno)
 // y 4 manzanas, una en cada cuadrante.
 void __fastcall TEscena::CrearEscenario()
@@ -633,6 +656,11 @@ void __fastcall TEscena::CrearEscenario()
     // Colocados mirando a la carretera o cerca de la fuente
     AddObject(NuevoBanco( M - 3.0f, -M + 5.0f, 90.0f)); // En la manzana de la fuente
     AddObject(NuevoBanco(-M + 3.0f, -M + 5.0f, -90.0f)); // En la manzana de la pista
+
+    // ***** Señales de tráfico *****
+    // Colocadas en las esquinas de acceso al cruce central
+    AddObject(NuevaSenal( A + 0.8f,  A + 3.0f,   0.0f));
+    AddObject(NuevaSenal(-A - 0.8f, -A - 3.0f, 180.0f));
 }
 
 //************************************************************** Clase TGui
