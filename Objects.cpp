@@ -587,6 +587,21 @@ static TPrimitiva *NuevoSemaforo(float x, float z, float giro = 0.0f)
     return s;
 }
 
+// Suelo de una manzana: se reutiliza Road.3ds (6.854 x 16.108 m, plano) estirado hasta ancho x largo
+static TPrimitiva *NuevoSuelo(float x, float z, float ancho, float largo, float r, float g, float b)
+{
+    TPrimitiva *s = new TPrimitiva(CRUCE_ID, CRUCE_ID);
+    s->tx = x;
+    s->tz = z;
+    s->sx = ancho / 6.854f;
+    s->sz = largo / 16.108f;
+    s->colores[0][0] = r;
+    s->colores[0][1] = g;
+    s->colores[0][2] = b;
+    s->colores[0][3] = 1.0f;
+    return s;
+}
+
 // Crea todo el escenario: un cruce central, 4 brazos de carretera (2 tramos cada uno)
 // y 4 manzanas, una en cada cuadrante.
 void __fastcall TEscena::CrearEscenario()
@@ -614,42 +629,73 @@ void __fastcall TEscena::CrearEscenario()
         AddObject(NuevaCarretera(-c,  0, 90));
     }
 
-    // ***** Manzana noreste (+X, +Z): edificio 1 *****
+    // ***** Suelo de las 4 manzanas (cada una de 32.2 x 32.2 m) *****
+    AddObject(NuevoSuelo( M,  M, 32.2f, 32.2f, 0.55f, 0.55f, 0.55f));   // NE: acera
+    AddObject(NuevoSuelo(-M,  M, 32.2f, 32.2f, 0.55f, 0.55f, 0.55f));   // NW: acera
+    AddObject(NuevoSuelo( M, -M, 32.2f, 32.2f, 0.75f, 0.72f, 0.60f));   // SE: plaza de la fuente
+    AddObject(NuevoSuelo(-M, -M, 32.2f, 32.2f, 0.20f, 0.40f, 0.20f));   // SW: zona verde de la pista
+
+    // ***** Manzana noreste (+X, +Z): edificio 1 + banco y papelera en la acera de delante *****
     TPrimitiva *edificio1 = new TPrimitiva(EDIFICIO_ID, EDIFICIO_ID);
     edificio1->tx = M;
     edificio1->tz = 8.0f;
     edificio1->colores[0][1] = 0.8;     // tinte verdoso
     AddObject(edificio1);
+    AddObject(NuevoBanco   (M - 6.0f, 5.4f, 180.0f));
+    AddObject(NuevaPapelera(M - 3.5f, 5.4f));
 
-    // ***** Manzana noroeste (-X, +Z): edificio 2 *****
+    // ***** Manzana noroeste (-X, +Z): edificio 2 + banco y papelera en la acera de delante *****
     TPrimitiva *edificio2 = new TPrimitiva(EDIFICIO_ID, EDIFICIO_ID);
     edificio2->tx = -M;
     edificio2->tz = 8.0f;
     edificio2->colores[0][2] = 0.8;     // tinte azulado
     AddObject(edificio2);
+    AddObject(NuevoBanco   (-M + 6.0f, 5.4f, 180.0f));
+    AddObject(NuevaPapelera(-M + 3.5f, 5.4f));
 
-    // ***** Manzana sureste (+X, -Z): fuente en el centro *****
+    // ***** Manzana sureste (+X, -Z): fuente en el centro, 2 bancos mirandola y una papelera *****
     TPrimitiva *fuente = new TPrimitiva(FUENTE_ID, FUENTE_ID);
     fuente->tx = M;
     fuente->tz = -M;
     AddObject(fuente);
+    AddObject(NuevoBanco   (M, -M + 4.5f, 180.0f));   // al norte de la fuente
+    AddObject(NuevoBanco   (M, -M - 4.5f,   0.0f));   // al sur de la fuente
+    AddObject(NuevaPapelera(M + 4.0f, -M + 4.5f));
 
-    // ***** Manzana suroeste (-X, -Z): pista *****
+    // ***** Manzana suroeste (-X, -Z): pista + banco y papelera en la acera de delante *****
     // La pista mide 40 m de ancho y la manzana 32.2: se estrecha un 25% solo en X
     TPrimitiva *pista = new TPrimitiva(PISTA_ID, PISTA_ID);
     pista->tx = -M;
     pista->tz = -M;
     pista->sx = 0.75f;
     AddObject(pista);
+    AddObject(NuevoBanco   (-M, -6.5f, 180.0f));
+    AddObject(NuevaPapelera(-M + 3.5f, -6.5f));
 
-    // ***** Farolas: 4 en las esquinas del cruce y 8 a lo largo de los brazos *****
+    // Zonas libres para lo que falta (arboles, parada de autobus, otros):
+    //   - detras de los edificios: x de +-6.5 a +-32.5, z de 23 a 35
+    //   - franja junto a las carreteras NS: x de +-3.5 a +-6.0
+    //   - alrededor de la pista y de la fuente
+
+    // ***** Farolas: 8 a lo largo de los brazos (las esquinas del cruce son de los semaforos) *****
     for (int a = -1; a <= 1; a += 2) {
         for (int b = -1; b <= 1; b += 2) {
-            AddObject(NuevaFarola(a * F, b * F));
             AddObject(NuevaFarola(a * F, b * M));
             AddObject(NuevaFarola(b * M, a * F));
         }
     }
+
+    // ***** Semaforos: uno en cada esquina del cruce *****
+    AddObject(NuevoSemaforo( A + 0.8f,  A + 0.8f,   0.0f));
+    AddObject(NuevoSemaforo(-A - 0.8f,  A + 0.8f,  -90.0f));
+    AddObject(NuevoSemaforo(-A - 0.8f, -A - 0.8f,  180.0f));
+    AddObject(NuevoSemaforo( A + 0.8f, -A - 0.8f,   90.0f));
+
+    // ***** Senales: una por brazo, un poco despues del semaforo *****
+    AddObject(NuevaSenal( A + 0.8f,  A + 3.0f,   0.0f));    // brazo norte
+    AddObject(NuevaSenal(-A - 0.8f, -A - 3.0f, 180.0f));    // brazo sur
+    AddObject(NuevaSenal( A + 3.0f, -A - 0.8f,  90.0f));    // brazo este
+    AddObject(NuevaSenal(-A - 3.0f,  A + 0.8f, -90.0f));    // brazo oeste
 
     // ***** Coches *****
     // Coche 1: brazo sur, en un carril (naranja, color del constructor)
@@ -669,28 +715,6 @@ void __fastcall TEscena::CrearEscenario()
 
     AddCar(car1);
     AddCar(car2);
-
-    // ***** Papeleras *****
-    // Situadas cerca del cruce central en las aceras
-    AddObject(NuevaPapelera( A + 0.5f, A + 1.5f));
-    AddObject(NuevaPapelera (-A - 0.5, -A - 1.5f));
-
-    // ***** Bancos *****
-    // Colocados mirando a la carretera o cerca de la fuente
-    AddObject(NuevoBanco( M - 3.0f, -M + 5.0f, 90.0f)); // En la manzana de la fuente
-    AddObject(NuevoBanco(-M + 3.0f, -M + 5.0f, -90.0f)); // En la manzana de la pista
-
-    // ***** Señales de tráfico *****
-    // Colocadas en las esquinas de acceso al cruce central
-    AddObject(NuevaSenal( A + 0.8f,  A + 3.0f,   0.0f));
-    AddObject(NuevaSenal(-A - 0.8f, -A - 3.0f, 180.0f));
-
-    // ***** Semáforos *****
-    // Regulando las 4 entradas al cruce central
-    AddObject(NuevoSemaforo( A + 0.8f,  A + 0.8f,   0.0f));
-    AddObject(NuevoSemaforo(-A - 0.8f,  A + 0.8f,  -90.0f));
-    AddObject(NuevoSemaforo(-A - 0.8f, -A - 0.8f,  180.0f));
-    AddObject(NuevoSemaforo( A + 0.8f, -A - 0.8f,   90.0f));
 }
 
 //************************************************************** Clase TGui
