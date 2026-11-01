@@ -37,6 +37,7 @@
 #define PAPELERA_ID     70
 #define BANCO_ID        80
 #define SENAL_ID        90
+#define SEMAFORO_ID     100
 
 #define COCHE_ID	    500
 

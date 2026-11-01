@@ -190,6 +190,19 @@ TPrimitiva::TPrimitiva(int DL, int t)
             modelo1 = NULL;
             break;
         }
+        case SEMAFORO_ID: { // Creación del semáforo
+            tx = 0.0;
+            ty = 0.0;
+            tz = 0.0;
+            ry = 0.0;
+
+            // Color gris oscuro/negro para la estructura
+            colores[0][0] = 0.2f; colores[0][1] = 0.2f; colores[0][2] = 0.2f; colores[0][3] = 1.0f;
+
+            modelo0 = Load3DS("../../Modelos/Semaforo.3ds", &num_vertices0);
+            modelo1 = NULL;
+            break;
+        }
 	} // switch
 }
 
@@ -300,7 +313,8 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
         case PISTA_ID:
         case PAPELERA_ID:
         case BANCO_ID:
-        case SENAL_ID: {
+        case SENAL_ID:
+        case SEMAFORO_ID: {
             if (modelo0 == NULL) break;   // el .3ds no se cargo: no dibujar
             if (tipo == CRUCE_ID && !escena.show_road) break;   // sigue el checkbox "Dibujar Carretera"
 
@@ -564,6 +578,15 @@ static TPrimitiva *NuevaSenal(float x, float z, float giro = 0.0f)
     return s;
 }
 
+static TPrimitiva *NuevoSemaforo(float x, float z, float giro = 0.0f)
+{
+    TPrimitiva *s = new TPrimitiva(SEMAFORO_ID, SEMAFORO_ID);
+    s->tx = x;
+    s->tz = z;
+    s->ry = giro;
+    return s;
+}
+
 // Crea todo el escenario: un cruce central, 4 brazos de carretera (2 tramos cada uno)
 // y 4 manzanas, una en cada cuadrante.
 void __fastcall TEscena::CrearEscenario()
@@ -661,6 +684,13 @@ void __fastcall TEscena::CrearEscenario()
     // Colocadas en las esquinas de acceso al cruce central
     AddObject(NuevaSenal( A + 0.8f,  A + 3.0f,   0.0f));
     AddObject(NuevaSenal(-A - 0.8f, -A - 3.0f, 180.0f));
+
+    // ***** Semáforos *****
+    // Regulando las 4 entradas al cruce central
+    AddObject(NuevoSemaforo( A + 0.8f,  A + 0.8f,   0.0f));
+    AddObject(NuevoSemaforo(-A - 0.8f,  A + 0.8f,  -90.0f));
+    AddObject(NuevoSemaforo(-A - 0.8f, -A - 0.8f,  180.0f));
+    AddObject(NuevoSemaforo( A + 0.8f, -A - 0.8f,   90.0f));
 }
 
 //************************************************************** Clase TGui
