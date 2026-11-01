@@ -56,6 +56,11 @@ TPrimitiva::TPrimitiva(int DL, int t)
 
     sx = sy = sz = 1;
     rx = ry = rz = 0;
+
+    // Valores seguros por si algun .3ds no se encuentra (Load3DS devuelve NULL)
+    modelo0 = modelo1 = NULL;
+    num_vertices0 = num_vertices1 = 0;
+
 	switch (tipo) {
 		case CARRETERA_ID: {  // Creación de la carretera
 		    tx = ty = tz = 0;
@@ -71,7 +76,7 @@ TPrimitiva::TPrimitiva(int DL, int t)
 		}
 		case EDIFICIO_ID: {  // Creación del edificio
 		    tx = 15.0;
-		    ty = -2.5;
+		    ty = 0.0;     // la base del edificio (y = 0.06) apoya sobre la carretera
 		    tz = 15.0;
 		    rr = 0.0;
 
@@ -79,13 +84,13 @@ TPrimitiva::TPrimitiva(int DL, int t)
 
             //************************ Cargar modelos 3ds ***********************************
             // formato 8 floats por vértice (x, y, z, A, B, C, u, v)
-            modelo0 = Load3DS("../../Modelos/Edificio.3ds", &num_vertices0);
+            modelo0 = Load3DS("../../Modelos/edificio.3ds", &num_vertices0);
             modelo1 = NULL;
             break;
 		}
 		case COCHE_ID: { // Creación del coche
 		    tx = -2.0;
-		    ty =  0.8;
+		    ty =  0.93;   // rueda: y local -0.5, radio 0.43 -> apoya en y = 0
 		    tz =  0.0;
 		    rr =  0.0;
 
@@ -95,6 +100,15 @@ TPrimitiva::TPrimitiva(int DL, int t)
             // formato 8 floats por vértice (x, y, z, A, B, C, u, v)
             modelo0 = Load3DS("../../Modelos/Carroceria.3ds", &num_vertices0);
             modelo1 = Load3DS("../../Modelos/Rueda.3ds", &num_vertices1);
+            break;
+		}
+		case CRUCE_ID: {  // Cruce: solo el asfalto de Road.3ds (sin lineas)
+		    tx = ty = tz = 0;
+
+            memcpy(colores, coloresr_c, 8*sizeof(float));
+
+            modelo0 = Load3DS("../../Modelos/Road.3ds", &num_vertices0);
+            modelo1 = NULL;
             break;
 		}
 		case FAROLA_ID: { // Creación de la farola
@@ -134,6 +148,19 @@ TPrimitiva::TPrimitiva(int DL, int t)
             colores[0][0] = 0.3; colores[0][1] = 0.6; colores[0][2] = 0.4; colores[0][3] = 1.0;
 
             modelo0 = Load3DS("../../Modelos/Pista.3ds", &num_vertices0);
+            modelo1 = NULL;
+            break;
+        }
+        case PAPELERA_ID: {
+            tx = 0.0;
+            ty = 0.0;
+            tz = 0.0;
+            ry = 0.0;
+
+            // Color gris oscuro / plástico-metal
+            colores[0][0] = 0.2f; colores[0][1] = 0.2f; colores[0][2] = 0.2f; colores[0][3] = 1.0f;
+
+            modelo0 = Load3DS("../../Modelos/Papelera.3ds", &num_vertices0);
             modelo1 = NULL;
             break;
         }
@@ -179,6 +206,7 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
                 modelMatrix     = glm::mat4(1.0f); // matriz identidad
                 modelMatrix     = glm::translate(modelMatrix, glm::vec3(tx, ty, tz));
                 modelMatrix     = glm::rotate(modelMatrix, (float) glm::radians(ry), glm::vec3(0,1,0)); // rotación alrededor del eje y en radianes
+                modelMatrix     = glm::scale(modelMatrix, glm::vec3(sx, sy, sz));
 
                 modelViewMatrix = escena.viewMatrix * modelMatrix;
                 // Envía nuestra ModelView al Vertex Shader
@@ -196,7 +224,7 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
         case COCHE_ID: {
             // 1. Matriz base: Coloca el coche y lo gira 180º para que mire hacia adelante en la carretera
             glm::mat4 baseMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(tx, ty, tz));
-            baseMatrix = glm::rotate(baseMatrix, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            baseMatrix = glm::rotate(baseMatrix, glm::radians(180.0f + ry), glm::vec3(0.0f, 1.0f, 0.0f));
 
             if (escena.show_car) {
                 glUniform4fv(escena.uColorLocation, 1, (const GLfloat *) colores[0]);
@@ -237,41 +265,24 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
             break;
         }
 
-        case FAROLA_ID: {
+        // Objetos estaticos de un solo modelo y un solo color.
+        // Para anadir uno nuevo: #define en Objects.h, case en el constructor
+        // (ruta del .3ds, color y posicion) y su ID en esta lista.
+        case CRUCE_ID:
+        case FAROLA_ID:
+        case FUENTE_ID:
+        case PISTA_ID:
+        case PAPELERA_ID: {
+            if (modelo0 == NULL) break;   // el .3ds no se cargo: no dibujar
+            if (tipo == CRUCE_ID && !escena.show_road) break;   // sigue el checkbox "Dibujar Carretera"
+
             glUniform4fv(escena.uColorLocation, 1, (const GLfloat *) colores[0]);
             glVertexAttribPointer(escena.aPositionLocation, POSITION_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo0);
             glVertexAttribPointer(escena.aNormalLocation, NORMAL_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo0+3);
 
             modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(tx, ty, tz));
             modelMatrix = glm::rotate(modelMatrix, glm::radians(ry), glm::vec3(0.0f, 1.0f, 0.0f));
-
-            modelViewMatrix = escena.viewMatrix * modelMatrix;
-            glUniformMatrix4fv(escena.uMVMatrixLocation, 1, GL_FALSE, &modelViewMatrix[0][0]);
-            glDrawArrays(GL_TRIANGLES, 0, num_vertices0);
-            break;
-        }
-
-        case FUENTE_ID: {
-            glUniform4fv(escena.uColorLocation, 1, (const GLfloat *) colores[0]);
-            glVertexAttribPointer(escena.aPositionLocation, POSITION_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo0);
-            glVertexAttribPointer(escena.aNormalLocation, NORMAL_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo0+3);
-
-            modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(tx, ty, tz));
-            modelMatrix = glm::rotate(modelMatrix, glm::radians(ry), glm::vec3(0.0f, 1.0f, 0.0f));
-
-            modelViewMatrix = escena.viewMatrix * modelMatrix;
-            glUniformMatrix4fv(escena.uMVMatrixLocation, 1, GL_FALSE, &modelViewMatrix[0][0]);
-            glDrawArrays(GL_TRIANGLES, 0, num_vertices0);
-            break;
-        }
-
-        case PISTA_ID: {
-            glUniform4fv(escena.uColorLocation, 1, (const GLfloat *) colores[0]);
-            glVertexAttribPointer(escena.aPositionLocation, POSITION_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo0);
-            glVertexAttribPointer(escena.aNormalLocation, NORMAL_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo0+3);
-
-            modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(tx, ty, tz));
-            modelMatrix = glm::rotate(modelMatrix, glm::radians(ry), glm::vec3(0.0f, 1.0f, 0.0f));
+            modelMatrix = glm::scale(modelMatrix, glm::vec3(sx, sy, sz));
 
             modelViewMatrix = escena.viewMatrix * modelMatrix;
             glUniformMatrix4fv(escena.uMVMatrixLocation, 1, GL_FALSE, &modelViewMatrix[0][0]);
@@ -480,72 +491,120 @@ void __fastcall TEscena::Pick3D(int mouse_x, int mouse_y)
 {
 }
 
-// Crea todo el escenario
+// Funciones auxiliares para crear instancias
+static TPrimitiva *NuevaCarretera(float x, float z, float giro)
+{
+    TPrimitiva *r = new TPrimitiva(CARRETERA_ID, CARRETERA_ID);
+    r->tx = x;
+    r->tz = z;
+    r->ry = giro;
+    return r;
+}
+
+static TPrimitiva *NuevaFarola(float x, float z)
+{
+    TPrimitiva *f = new TPrimitiva(FAROLA_ID, FAROLA_ID);
+    f->tx = x;
+    f->tz = z;
+    return f;
+}
+
+static TPrimitiva *NuevaPapelera(float x, float z, float giro = 0.0f)
+{
+    TPrimitiva *p = new TPrimitiva(PAPELERA_ID, PAPELERA_ID);
+    p->tx = x;
+    p->tz = z;
+    p->ry = giro;
+    return p;
+}
+
+// Crea todo el escenario: un cruce central, 4 brazos de carretera (2 tramos cada uno)
+// y 4 manzanas, una en cada cuadrante.
 void __fastcall TEscena::CrearEscenario()
 {
-    // ***** Instanciación de objetos *****
-    TPrimitiva *road1 = new TPrimitiva(CARRETERA_ID, CARRETERA_ID);
-    TPrimitiva *road2 = new TPrimitiva(CARRETERA_ID, CARRETERA_ID);
+    // Medidas de Road.3ds (en metros)
+    const float A = 3.427f;          // semianchura de la carretera (eje X)
+    const float H = 8.054f;          // semilongitud de un tramo (eje Z)
+    const float C1 = A + H;          // centro del 1er tramo de cada brazo (11.481)
+    const float C2 = A + 3.0f * H;   // centro del 2o tramo de cada brazo (27.589)
+    const float M  = A + 2.0f * H;   // centro de cada manzana (19.535); cada una mide 32.2 x 32.2
+    const float F  = A + 0.8f;       // las farolas se colocan a 0.8 m del borde de la carretera
 
+    // ***** Carreteras *****
+    // Cruce: se usa Road.3ds sin lineas y se acorta en Z (A/H) para que quede cuadrado
+    TPrimitiva *cruce = new TPrimitiva(CRUCE_ID, CRUCE_ID);
+    cruce->sz = A / H;
+    AddObject(cruce);
+
+    // Brazos: norte (+Z), sur (-Z), este (+X) y oeste (-X). Los de X se giran 90 grados.
+    for (int i = 0; i < 2; i++) {
+        float c = (i == 0) ? C1 : C2;
+        AddObject(NuevaCarretera( 0,  c,  0));
+        AddObject(NuevaCarretera( 0, -c,  0));
+        AddObject(NuevaCarretera( c,  0, 90));
+        AddObject(NuevaCarretera(-c,  0, 90));
+    }
+
+    // ***** Manzana noreste (+X, +Z): edificio 1 *****
     TPrimitiva *edificio1 = new TPrimitiva(EDIFICIO_ID, EDIFICIO_ID);
+    edificio1->tx = M;
+    edificio1->tz = 8.0f;
+    edificio1->colores[0][1] = 0.8;     // tinte verdoso
+    AddObject(edificio1);
+
+    // ***** Manzana noroeste (-X, +Z): edificio 2 *****
     TPrimitiva *edificio2 = new TPrimitiva(EDIFICIO_ID, EDIFICIO_ID);
+    edificio2->tx = -M;
+    edificio2->tz = 8.0f;
+    edificio2->colores[0][2] = 0.8;     // tinte azulado
+    AddObject(edificio2);
 
-    TPrimitiva *farola1 = new TPrimitiva(FAROLA_ID, FAROLA_ID);
-    TPrimitiva *farola2 = new TPrimitiva(FAROLA_ID, FAROLA_ID);
-
-    TPrimitiva *car1 = new TPrimitiva(1, COCHE_ID);
-    TPrimitiva *car2 = new TPrimitiva(2, COCHE_ID);
-
+    // ***** Manzana sureste (+X, -Z): fuente en el centro *****
     TPrimitiva *fuente = new TPrimitiva(FUENTE_ID, FUENTE_ID);
+    fuente->tx = M;
+    fuente->tz = -M;
+    AddObject(fuente);
+
+    // ***** Manzana suroeste (-X, -Z): pista *****
+    // La pista mide 40 m de ancho y la manzana 32.2: se estrecha un 25% solo en X
     TPrimitiva *pista = new TPrimitiva(PISTA_ID, PISTA_ID);
+    pista->tx = -M;
+    pista->tz = -M;
+    pista->sx = 0.75f;
+    AddObject(pista);
 
-    // ***** Configuración de carreteras *****
-    // road1 se queda en el origen por defecto
-    road2->tx = 0;
-    road2->tz = 16; // Desplazada en Z para alargar el trazado
+    // ***** Farolas: 4 en las esquinas del cruce y 8 a lo largo de los brazos *****
+    for (int a = -1; a <= 1; a += 2) {
+        for (int b = -1; b <= 1; b += 2) {
+            AddObject(NuevaFarola(a * F, b * F));
+            AddObject(NuevaFarola(a * F, b * M));
+            AddObject(NuevaFarola(b * M, a * F));
+        }
+    }
 
-    // ***** Configuración de edificios *****
-    // Edificio 1: Posición por defecto, pero se le da un tinte verdoso
-    edificio1->colores[0][1]=0.8;
+    // ***** Coches *****
+    // Coche 1: brazo sur, en un carril (naranja, color del constructor)
+    TPrimitiva *car1 = new TPrimitiva(1, COCHE_ID);
+    car1->tx = -A / 2.0f;
+    car1->tz = -C1;
 
-    // Edificio 2: Desplazado, rotado, escalado y con tinte azulado
-    edificio2->tx = 27;
-    edificio2->ry = 180; // Gira 180 para mirar hacia la carretera
-    edificio2->sx = 2.0; // Se hace el doble de ancho en el eje X
-    edificio2->colores[0][2] = 0.8;
-
-    // ***** Configuración de farolas *****
-    farola1->tx = 4.0; // Situada en la acera derecha
-    farola1->tz = 5.0;
-
-    farola2->tx = -4.0; // Situada en la acera izquierda
-    farola2->tz = -5.0;
-
-    // ***** Configuración de coches *****
-    // Coche 1: Usa los valores del constructor por defecto (naranja, en tx=-2.0)
-
-    // Coche 2: Se cambia su color a azul y se ajusta a su posición inicial
+    // Coche 2: brazo este, girado 90 grados, en azul
+    TPrimitiva *car2 = new TPrimitiva(2, COCHE_ID);
+    car2->tx = C1;
+    car2->tz = A / 2.0f;
+    car2->ry = 90;
     car2->colores[0][0] = 0.1;
     car2->colores[0][1] = 0.4;
     car2->colores[0][2] = 0.9;
     car2->colores[0][3] = 1.0;
-    car2->tx = 2;
-    car2->tz = 3;
 
-    // ***** Añadir a la escena para renderizar *****
-    // Los objetos estáticos van a la lista principal
-    AddObject(road1);
-    AddObject(road2);
-    AddObject(edificio1);
-    AddObject(edificio2);
-    AddObject(farola1);
-    AddObject(farola2);
-    AddObject(fuente);
-    AddObject(pista);
-
-    // Los coches usan AddCar para gestionarlos con el selector y la cámara
     AddCar(car1);
     AddCar(car2);
+
+    // ***** Papeleras *****
+    // Situadas cerca del cruce central en las aceras
+    AddObject(NuevaPapelera( A + 0.5f, A + 1.5f));
+    AddObject(NuevaPapelera (-A - 0.5, -A - 1.5f));
 }
 
 //************************************************************** Clase TGui
