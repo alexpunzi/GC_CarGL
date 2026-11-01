@@ -151,7 +151,7 @@ TPrimitiva::TPrimitiva(int DL, int t)
             modelo1 = NULL;
             break;
         }
-        case PAPELERA_ID: {
+        case PAPELERA_ID: { // Creación de la papelera
             tx = 0.0;
             ty = 0.0;
             tz = 0.0;
@@ -161,6 +161,19 @@ TPrimitiva::TPrimitiva(int DL, int t)
             colores[0][0] = 0.2f; colores[0][1] = 0.2f; colores[0][2] = 0.2f; colores[0][3] = 1.0f;
 
             modelo0 = Load3DS("../../Modelos/Papelera.3ds", &num_vertices0);
+            modelo1 = NULL;
+            break;
+        }
+        case BANCO_ID: {
+            tx = 0.0;
+            ty = 0.0;
+            tz = 0.0;
+            ry = 0.0;
+
+            // Color marrón/madera o gris para el banco
+            colores[0][0] = 0.5f; colores[0][1] = 0.3f; colores[0][2] = 0.1f; colores[0][3] = 1.0f;
+
+            modelo0 = Load3DS("../../Modelos/Banco.3ds", &num_vertices0);
             modelo1 = NULL;
             break;
         }
@@ -272,7 +285,8 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
         case FAROLA_ID:
         case FUENTE_ID:
         case PISTA_ID:
-        case PAPELERA_ID: {
+        case PAPELERA_ID:
+        case BANCO_ID: {
             if (modelo0 == NULL) break;   // el .3ds no se cargo: no dibujar
             if (tipo == CRUCE_ID && !escena.show_road) break;   // sigue el checkbox "Dibujar Carretera"
 
@@ -518,6 +532,15 @@ static TPrimitiva *NuevaPapelera(float x, float z, float giro = 0.0f)
     return p;
 }
 
+static TPrimitiva *NuevoBanco(float x, float z, float giro = 0.0f)
+{
+    TPrimitiva *b = new TPrimitiva(BANCO_ID, BANCO_ID);
+    b->tx = x;
+    b->tz = z;
+    b->ry = giro;
+    return b;
+}
+
 // Crea todo el escenario: un cruce central, 4 brazos de carretera (2 tramos cada uno)
 // y 4 manzanas, una en cada cuadrante.
 void __fastcall TEscena::CrearEscenario()
@@ -605,6 +628,11 @@ void __fastcall TEscena::CrearEscenario()
     // Situadas cerca del cruce central en las aceras
     AddObject(NuevaPapelera( A + 0.5f, A + 1.5f));
     AddObject(NuevaPapelera (-A - 0.5, -A - 1.5f));
+
+    // ***** Bancos *****
+    // Colocados mirando a la carretera o cerca de la fuente
+    AddObject(NuevoBanco( M - 3.0f, -M + 5.0f, 90.0f)); // En la manzana de la fuente
+    AddObject(NuevoBanco(-M + 3.0f, -M + 5.0f, -90.0f)); // En la manzana de la pista
 }
 
 //************************************************************** Clase TGui

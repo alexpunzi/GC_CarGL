@@ -35,6 +35,7 @@
 #define FUENTE_ID       50
 #define PISTA_ID        60
 #define PAPELERA_ID     70
+#define BANCO_ID        80
 
 #define COCHE_ID	    500
 
