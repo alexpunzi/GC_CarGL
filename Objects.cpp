@@ -62,148 +62,97 @@ TPrimitiva::TPrimitiva(int DL, int t)
     num_vertices0 = num_vertices1 = 0;
 
 	switch (tipo) {
-		case CARRETERA_ID: {  // Creaci�n de la carretera
+		case CARRETERA_ID: {  // Creacion de la carretera
 		    tx = ty = tz = 0;
-
             memcpy(colores, coloresr_c, 8*sizeof(float));
 
             //************************ Cargar modelos 3ds ***********************************
-            // formato 8 floats por v�rtice (x, y, z, A, B, C, u, v)
+            // Formato 8 floats por vertice (x, y, z, A, B, C, u, v)
             modelo0 = Load3DS("../../Modelos/Road.3ds", &num_vertices0);
             modelo1 = Load3DS("../../Modelos/Lines.3ds", &num_vertices1);
 
             break;
 		}
-		case EDIFICIO_ID: {  // Creaci�n del edificio
+		case EDIFICIO_ID: {  // Creacion del edificio
 		    tx = 15.0;
-		    ty = 0.0;     // la base del edificio (y = 0.06) apoya sobre la carretera
+		    ty = 0.0;   // La base del edificio (y = 0.06) apoya sobre la carretera
 		    tz = 15.0;
 		    rr = 0.0;
-
             memcpy(colores, coloresr_c, 8*sizeof(float));
-
-            //************************ Cargar modelos 3ds ***********************************
-            // formato 8 floats por v�rtice (x, y, z, A, B, C, u, v)
             modelo0 = Load3DS("../../Modelos/edificio.3ds", &num_vertices0);
-            modelo1 = NULL;
             break;
 		}
-		case COCHE_ID: { // Creaci�n del coche
+		case COCHE_ID: { // Creacion del coche
 		    tx = -2.0;
-		    ty =  0.93;   // rueda: y local -0.5, radio 0.43 -> apoya en y = 0
+		    ty =  0.93; // Rueda: y local -0.5, radio 0.43 -> apoya en y = 0
 		    tz =  0.0;
 		    rr =  0.0;
-
 		    memcpy(colores, coloresc_c, 8*sizeof(float));
-
-            //************************ Cargar modelos 3ds ***********************************
-            // formato 8 floats por v�rtice (x, y, z, A, B, C, u, v)
             modelo0 = Load3DS("../../Modelos/Carroceria.3ds", &num_vertices0);
             modelo1 = Load3DS("../../Modelos/Rueda.3ds", &num_vertices1);
             break;
 		}
 		case CRUCE_ID: {  // Cruce: solo el asfalto de Road.3ds (sin lineas)
 		    tx = ty = tz = 0;
-
             memcpy(colores, coloresr_c, 8*sizeof(float));
-
             modelo0 = Load3DS("../../Modelos/Road.3ds", &num_vertices0);
-            modelo1 = NULL;
             break;
 		}
-		case FAROLA_ID: { // Creaci�n de la farola
-            tx = 0.0;
-            ty = 0.0; // La base tocar� el suelo
-            tz = 0.0;
-            ry = 0.0; // Para rotarla si fuera necesario
-
-            // Color gris oscuro/metal
-            colores[0][0] = 0.3; colores[0][1] = 0.3; colores[0][2] = 0.3; colores[0][3] = 1.0;
-
-            //************************ Cargar modelos 3ds ***********************************
-            // formato 8 floats por v�rtice (x, y, z, A, B, C, u, v)
+		case FAROLA_ID: { // Creacion de la farola
+            tx = ty = tz = ry = 0.0;
+            memcpy(colores, coloresr_c, 8*sizeof(float));
             modelo0 = Load3DS("../../Modelos/Farola.3ds", &num_vertices0);
             break;
 		}
-		case FUENTE_ID: { // Creaci�n de la fuente
+		case FUENTE_ID: { // Creacion de la fuente
             tx = -8.0;
             ty = 0.0;
             tz = 10.0;
             ry = 0.0;
-
-            // Color piedra / gris claro
-            colores[0][0] = 0.7; colores[0][1] = 0.7; colores[0][2] = 0.7; colores[0][3] = 1.0;
-
+            memcpy(colores, coloresr_c, 8*sizeof(float));
             modelo0 = Load3DS("../../Modelos/Fuente.3ds", &num_vertices0);
-            modelo1 = NULL;
             break;
 		}
-		case PISTA_ID: { // Creaci�n de la pista
+		case PISTA_ID: { // Creacion de la pista
             tx = 25.0;
             ty = 0.0;
             tz = -20.0;
             ry = 0.0;
-
-            // Color verdoso/gris�ceo para la pista
-            colores[0][0] = 0.3; colores[0][1] = 0.6; colores[0][2] = 0.4; colores[0][3] = 1.0;
-
+            memcpy(colores, coloresr_c, 8*sizeof(float));
             modelo0 = Load3DS("../../Modelos/Pista.3ds", &num_vertices0);
-            modelo1 = NULL;
             break;
         }
-        case PAPELERA_ID: { // Creaci�n de la papelera
-            tx = 0.0;
-            ty = 0.0;
-            tz = 0.0;
-            ry = 0.0;
-
-            // Color gris oscuro / pl�stico-metal
-            colores[0][0] = 0.2f; colores[0][1] = 0.2f; colores[0][2] = 0.2f; colores[0][3] = 1.0f;
-
+        case PAPELERA_ID: { // Creacion de la papelera
+            tx = ty = tz = ry = 0.0;
+            memcpy(colores, coloresr_c, 8*sizeof(float));
             modelo0 = Load3DS("../../Modelos/Papelera.3ds", &num_vertices0);
-            modelo1 = NULL;
             break;
         }
-        case BANCO_ID: { // Creaci�n del banco
-            tx = 0.0;
-            ty = 0.0;
-            tz = 0.0;
-            ry = 0.0;
-
-            // Color marr�n/madera o gris para el banco
-            colores[0][0] = 0.5f; colores[0][1] = 0.3f; colores[0][2] = 0.1f; colores[0][3] = 1.0f;
-
+        case BANCO_ID: { // Creacion del banco
+            tx = ty = tz = ry = 0.0;
+            memcpy(colores, coloresr_c, 8*sizeof(float));
             modelo0 = Load3DS("../../Modelos/Banco.3ds", &num_vertices0);
-            modelo1 = NULL;
             break;
         }
-        case SENAL_ID: { // Creaci�n de la se�al
-            tx = 0.0;
-            ty = 0.0;
-            tz = 0.0;
-            ry = 0.0;
-
-            // Color gris claro/metalizado para el poste y placa
-            colores[0][0] = 0.7f; colores[0][1] = 0.7f; colores[0][2] = 0.7f; colores[0][3] = 1.0f;
-
+        case SENAL_ID: { // Creacion de la senal
+            tx = ty = tz = ry = 0.0;
+            memcpy(colores, coloresr_c, 8*sizeof(float));
             modelo0 = Load3DS("../../Modelos/Senal.3ds", &num_vertices0);
-            modelo1 = NULL;
             break;
         }
-        case SEMAFORO_ID: { // Creaci�n del sem�foro
-            tx = 0.0;
-            ty = 0.0;
-            tz = 0.0;
-            ry = 0.0;
-
-            // Color gris oscuro/negro para la estructura
-            colores[0][0] = 0.2f; colores[0][1] = 0.2f; colores[0][2] = 0.2f; colores[0][3] = 1.0f;
-
+        case SEMAFORO_ID: { // Creacion del semaforo
+            tx = ty = tz = ry = 0.0;
+            memcpy(colores, coloresr_c, 8*sizeof(float));
             modelo0 = Load3DS("../../Modelos/Semaforo.3ds", &num_vertices0);
-            modelo1 = NULL;
             break;
         }
-	} // switch
+        case ARBOL_ID: { // Creacion del arbol
+            tx = ty = tz = ry = 0.0;
+            memcpy(colores, coloresr_c, 8*sizeof(float));
+            modelo0 = Load3DS("../../Modelos/Arbol.3ds", &num_vertices0);
+            break;
+        }
+	} // Switch
 }
 
 void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
@@ -214,14 +163,14 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
     switch (tipo) {
         case CARRETERA_ID: {
             if (escena.show_road) {
-                // C�lculo de la ModelView
+                // Calculo de la ModelView
                 modelMatrix     = glm::mat4(1.0f);
                 modelMatrix     = glm::translate(modelMatrix, glm::vec3(tx, ty, tz));
                 modelMatrix     = glm::rotate(modelMatrix, (float) glm::radians(ry), glm::vec3(0,1,0)); // rotaci�n alrededor del eje y en radianes
 
                 modelViewMatrix = escena.viewMatrix * modelMatrix;
 
-                // Env�a nuestra ModelView al Vertex Shader
+                // Envia nuestra ModelView al Vertex Shader
                 glUniformMatrix4fv(escena.uMVMatrixLocation, 1, GL_FALSE, &modelViewMatrix[0][0]);
 
                 // Pintar la carretera
@@ -230,7 +179,7 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
                 glVertexAttribPointer(escena.aNormalLocation, NORMAL_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo0+3);
                 glDrawArrays(GL_TRIANGLES, 0, num_vertices0);
 
-                // Pintar las l�neas
+                // Pintar las lineas
                 glUniform4fv(escena.uColorLocation, 1, colores[1]);
                 glVertexAttribPointer(escena.aPositionLocation, POSITION_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo1);
                 glVertexAttribPointer(escena.aNormalLocation, NORMAL_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo1+3);
@@ -241,14 +190,14 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
 
         case EDIFICIO_ID: {
             if (escena.show_road) {
-                // C�lculo de la ModelView
+                // Calculo de la ModelView
                 modelMatrix     = glm::mat4(1.0f); // matriz identidad
                 modelMatrix     = glm::translate(modelMatrix, glm::vec3(tx, ty, tz));
                 modelMatrix     = glm::rotate(modelMatrix, (float) glm::radians(ry), glm::vec3(0,1,0)); // rotaci�n alrededor del eje y en radianes
                 modelMatrix     = glm::scale(modelMatrix, glm::vec3(sx, sy, sz));
 
                 modelViewMatrix = escena.viewMatrix * modelMatrix;
-                // Env�a nuestra ModelView al Vertex Shader
+                // Envia nuestra ModelView al Vertex Shader
                 glUniformMatrix4fv(escena.uMVMatrixLocation, 1, GL_FALSE, &modelViewMatrix[0][0]);
 
                 // Pintar la carretera (edificio)
@@ -314,7 +263,8 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
         case PAPELERA_ID:
         case BANCO_ID:
         case SENAL_ID:
-        case SEMAFORO_ID: {
+        case SEMAFORO_ID:
+        case ARBOL_ID: {
             if (modelo0 == NULL) break;   // el .3ds no se cargo: no dibujar
             if (tipo == CRUCE_ID && !escena.show_road) break;   // sigue el checkbox "Dibujar Carretera"
 
@@ -332,7 +282,7 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
             break;
         }
 
-    } // switch
+    } // Switch
 }
 
 //************************************************************** Clase TEscena
@@ -386,7 +336,7 @@ void __fastcall TEscena::InitGL()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
-    // Inicializaci�n de GLEW
+    // Inicializacion de GLEW
     std::cout << "Inicializando GLEW" << std::endl << std::endl;
     if(glewInit() != GLEW_OK)
         throw std::runtime_error("glewInit failed");
@@ -549,10 +499,7 @@ static TPrimitiva *NuevaPapelera(float x, float z, float giro = 0.0f) {
 static TPrimitiva *NuevoBanco(float x, float z, float giro = 0.0f)
 {
     TPrimitiva *b = new TPrimitiva(BANCO_ID, BANCO_ID);
-    b->tx = x;
-    b->tz = z;
-    b->ry = giro;
-    return b;
+    b->tx = x; b->tz = z; b->ry = giro; return b;
 }
 static TPrimitiva *NuevaSenal(float x, float z, float giro = 0.0f) {
     TPrimitiva *s = new TPrimitiva(SENAL_ID, SENAL_ID);
@@ -567,6 +514,11 @@ static TPrimitiva *NuevoSuelo(float x, float z, float ancho, float largo, float 
     s->tx = x; s->tz = z; s->sx = ancho / 6.854f; s->sz = largo / 16.108f;
     s->colores[0][0] = r; s->colores[0][1] = g; s->colores[0][2] = b; s->colores[0][3] = 1.0f;
     return s;
+}
+
+static TPrimitiva *NuevoArbol(float x, float z, float giro = 0.0f) {
+    TPrimitiva *a = new TPrimitiva(ARBOL_ID, ARBOL_ID);
+    a->tx = x; a->tz = z; a->ry = giro; return a;
 }
 
 // Crea todo el escenario: un cruce central, 4 brazos de carretera (2 tramos cada uno)
@@ -644,10 +596,15 @@ void __fastcall TEscena::CrearEscenario()
     AddObject(fuente);
 
     // Solo dos bancos a los lados de la fuente, separados 9 metros del centro
-    AddObject(NuevoBanco(M, -M + 9.0f, 180.0f)); // Lado Norte mirando a la fuente
-    AddObject(NuevoBanco(M, -M - 9.0f,   0.0f)); // Lado Sur mirando a la fuente
+    AddObject(NuevoBanco(M, -M + 9.0f, 0.0f)); // Lado Norte mirando a la fuente
+    AddObject(NuevoBanco(M, -M - 9.0f, 0.0f)); // Lado Sur mirando a la fuente
 
-    AddObject(NuevaPapelera(M - 4.0f, -M + 4.0f)); // Esquina noroeste de la fuente
+    AddObject(NuevaPapelera(M + 2.5f, -M + 9.0f)); // Pegada al lado derecho del banco
+
+    // Árboles en la Plaza de la Fuente (Sureste)
+    AddObject(NuevoArbol(M - 10.0f, -M + 10.0f));
+    AddObject(NuevoArbol(M + 10.0f, -M + 10.0f));
+    AddObject(NuevoArbol(M - 10.0f, -M - 10.0f));
 
     // 5. PARQUE DEPORTIVO (Suroeste) ==========================================
     TPrimitiva *pista = new TPrimitiva(PISTA_ID, PISTA_ID);
@@ -657,6 +614,12 @@ void __fastcall TEscena::CrearEscenario()
     // Zona de espectadores (Solo papeleras)
     AddObject(NuevaPapelera(-M - 6.5f, -9.0f));
     AddObject(NuevaPapelera(-M + 6.5f, -9.0f));
+
+    // Árboles en el parque deportivo
+    AddObject(NuevoArbol(-M - 12.0f, -M + 12.0f)); // Esquina superior izquierda del parque
+    AddObject(NuevoArbol(-M + 12.0f, -M + 12.0f)); // Esquina superior derecha del parque
+    AddObject(NuevoArbol(-M - 12.0f, -M - 12.0f)); // Esquina inferior izquierda del parque
+    AddObject(NuevoArbol(-M + 12.0f, -M - 12.0f)); // Esquina inferior derecha del parque
 
     // 6. COCHES ===============================================================
     // Coche 1 (Naranja): Viene del Sur, va hacia el Norte (Carril derecho, +X)

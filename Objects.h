@@ -29,8 +29,8 @@
 
 // Identificadores internos de los objetos y el coche
 #define CARRETERA_ID    10
-#define CRUCE_ID        12
-#define EDIFICIO_ID     20
+#define CRUCE_ID        20
+#define EDIFICIO_ID     30
 #define FAROLA_ID       40
 #define FUENTE_ID       50
 #define PISTA_ID        60
@@ -38,6 +38,7 @@
 #define BANCO_ID        80
 #define SENAL_ID        90
 #define SEMAFORO_ID     100
+#define ARBOL_ID        110
 
 #define COCHE_ID	    500
 
