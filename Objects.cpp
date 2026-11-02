@@ -595,16 +595,13 @@ void __fastcall TEscena::CrearEscenario()
     fuente->tx = M; fuente->tz = -M; // Centro exacto de la manzana
     AddObject(fuente);
 
-    // Solo dos bancos a los lados de la fuente, separados 9 metros del centro
-    AddObject(NuevoBanco(M, -M + 9.0f, 0.0f)); // Lado Norte mirando a la fuente
-    AddObject(NuevoBanco(M, -M - 9.0f, 0.0f)); // Lado Sur mirando a la fuente
+    // Cuatro bancos en cuadrado rodeando la fuente y mirando hacia el centro:
+    AddObject(NuevoBanco(M,        -M + 8.5f, -90.0f)); // Banco Norte (asiento hacia el Sur)
+    AddObject(NuevoBanco(M,        -M - 8.5f,   90.0f)); // Banco Sur (asiento hacia el Norte)
+    AddObject(NuevoBanco(M - 8.5f, -M,         180.0f)); // Banco Oeste (asiento hacia el Este)
+    AddObject(NuevoBanco(M + 8.5f, -M,        0.0f)); // Banco Este (asiento hacia el Oeste)
 
-    AddObject(NuevaPapelera(M + 2.5f, -M + 9.0f)); // Pegada al lado derecho del banco
-
-    // Árboles en la Plaza de la Fuente (Sureste)
-    AddObject(NuevoArbol(M - 10.0f, -M + 10.0f));
-    AddObject(NuevoArbol(M + 10.0f, -M + 10.0f));
-    AddObject(NuevoArbol(M - 10.0f, -M - 10.0f));
+    AddObject(NuevaPapelera(M + 3.0f, -M + 8.5f)); // Papelera pegada al banco Norte
 
     // 5. PARQUE DEPORTIVO (Suroeste) ==========================================
     TPrimitiva *pista = new TPrimitiva(PISTA_ID, PISTA_ID);
