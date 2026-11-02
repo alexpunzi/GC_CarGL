@@ -1,14 +1,13 @@
-
 /****************************************************************************************
 
     CarGL (Objects.cpp)
 
-    Grado en Ingenier�a Multimedia.
-    Pr�ctica de Gr�ficos por Computador.
+    Grado en Ingenieria Multimedia.
+    Practica de Graficos por Computador.
     OpenGL con Shaders.
   ---------------------------------------------------------------------------------------
 
-    2012 - 2022 (C) Juan Antonio Puchol Garc�a (puchol@dccia.ua.es)
+    2012 - 2022 (C) Juan Antonio Puchol García (puchol@dccia.ua.es)
 
 
 *****************************************************************************************/
@@ -38,8 +37,8 @@ GLfloat mat_shininess_c[1] = { 100.0f };
 float view_rotate_c[16] = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
 float view_position_c[3] = { 0.0, -2.0, -9.0 };
 
-float coloresc_c[2][4] = { {0.8, 0.5, 0.0, 1.0}, {0.5, 0.5, 0.5, 1.0}}; // Color del coche
-float coloresr_c[2][4] = { {0.3, 0.3, 0.3, 1.0}, {1.0, 1.0, 1.0, 1.0}}; // Color de la carretera
+float coloresc_c[2][4] = { {0.8, 0.5, 0.0, 1.0}, {0.5, 0.5, 0.5, 1.0}};	// Color del coche
+float coloresr_c[2][4] = { {0.3, 0.3, 0.3, 1.0}, {1.0, 1.0, 1.0, 1.0}};	// Color de la carretera
 
 //************************************************************** Variables de clase
 
@@ -62,7 +61,7 @@ TPrimitiva::TPrimitiva(int DL, int t)
     num_vertices0 = num_vertices1 = 0;
 
 	switch (tipo) {
-		case CARRETERA_ID: {  // Creacion de la carretera
+		case CARRETERA_ID: {	// Creación de la carretera
 		    tx = ty = tz = 0;
             memcpy(colores, coloresr_c, 8*sizeof(float));
 
@@ -73,18 +72,18 @@ TPrimitiva::TPrimitiva(int DL, int t)
 
             break;
 		}
-		case EDIFICIO_ID: {  // Creacion del edificio
+		case EDIFICIO_ID: {	// Creación del edificio
 		    tx = 15.0;
-		    ty = 0.0;   // La base del edificio (y = 0.06) apoya sobre la carretera
+		    ty = 0.0;	// La base del edificio (y = 0.06) apoya sobre la carretera
 		    tz = 15.0;
 		    rr = 0.0;
             memcpy(colores, coloresr_c, 8*sizeof(float));
             modelo0 = Load3DS("../../Modelos/edificio.3ds", &num_vertices0);
             break;
 		}
-		case COCHE_ID: { // Creacion del coche
+		case COCHE_ID: {	// Creación del coche
 		    tx = -2.0;
-		    ty =  0.93; // Rueda: y local -0.5, radio 0.43 -> apoya en y = 0
+		    ty =  0.93;	// Rueda: y local -0.5, radio 0.43 -> apoya en y = 0
 		    tz =  0.0;
 		    rr =  0.0;
 		    memcpy(colores, coloresc_c, 8*sizeof(float));
@@ -92,19 +91,19 @@ TPrimitiva::TPrimitiva(int DL, int t)
             modelo1 = Load3DS("../../Modelos/Rueda.3ds", &num_vertices1);
             break;
 		}
-		case CRUCE_ID: {  // Cruce: solo el asfalto de Road.3ds (sin lineas)
+		case CRUCE_ID: {	// Cruce: solo el asfalto de Road.3ds (sin lineas)
 		    tx = ty = tz = 0;
             memcpy(colores, coloresr_c, 8*sizeof(float));
             modelo0 = Load3DS("../../Modelos/Road.3ds", &num_vertices0);
             break;
 		}
-		case FAROLA_ID: { // Creacion de la farola
+		case FAROLA_ID: {	// Creación de la farola
             tx = ty = tz = ry = 0.0;
             memcpy(colores, coloresr_c, 8*sizeof(float));
             modelo0 = Load3DS("../../Modelos/Farola.3ds", &num_vertices0);
             break;
 		}
-		case FUENTE_ID: { // Creacion de la fuente
+		case FUENTE_ID: {	// Creación de la fuente
             tx = -8.0;
             ty = 0.0;
             tz = 10.0;
@@ -113,7 +112,7 @@ TPrimitiva::TPrimitiva(int DL, int t)
             modelo0 = Load3DS("../../Modelos/Fuente.3ds", &num_vertices0);
             break;
 		}
-		case PISTA_ID: { // Creacion de la pista
+		case PISTA_ID: {	// Creación de la pista
             tx = 25.0;
             ty = 0.0;
             tz = -20.0;
@@ -122,34 +121,40 @@ TPrimitiva::TPrimitiva(int DL, int t)
             modelo0 = Load3DS("../../Modelos/Pista.3ds", &num_vertices0);
             break;
         }
-        case PAPELERA_ID: { // Creacion de la papelera
+        case PAPELERA_ID: {	// Creación de la papelera
             tx = ty = tz = ry = 0.0;
             memcpy(colores, coloresr_c, 8*sizeof(float));
             modelo0 = Load3DS("../../Modelos/Papelera.3ds", &num_vertices0);
             break;
         }
-        case BANCO_ID: { // Creacion del banco
+        case BANCO_ID: {	// Creación del banco
             tx = ty = tz = ry = 0.0;
             memcpy(colores, coloresr_c, 8*sizeof(float));
             modelo0 = Load3DS("../../Modelos/Banco.3ds", &num_vertices0);
             break;
         }
-        case SENAL_ID: { // Creacion de la senal
+        case SENAL_ID: {	// Creación de la señal
             tx = ty = tz = ry = 0.0;
             memcpy(colores, coloresr_c, 8*sizeof(float));
             modelo0 = Load3DS("../../Modelos/Senal.3ds", &num_vertices0);
             break;
         }
-        case SEMAFORO_ID: { // Creacion del semaforo
+        case SEMAFORO_ID: {	// Creación del semaforo
             tx = ty = tz = ry = 0.0;
             memcpy(colores, coloresr_c, 8*sizeof(float));
             modelo0 = Load3DS("../../Modelos/Semaforo.3ds", &num_vertices0);
             break;
         }
-        case ARBOL_ID: { // Creacion del arbol
+        case ARBOL_ID: {	// Creación del árbol
             tx = ty = tz = ry = 0.0;
             memcpy(colores, coloresr_c, 8*sizeof(float));
             modelo0 = Load3DS("../../Modelos/Arbol.3ds", &num_vertices0);
+            break;
+        }
+        case PARADA_ID: {	// Creación de la parada de bus
+            tx = ty = tz = ry = 0.0;
+            memcpy(colores, coloresr_c, 8*sizeof(float));
+            modelo0 = Load3DS("../../Modelos/Parada.3ds", &num_vertices0);
             break;
         }
 	} // Switch
@@ -166,7 +171,7 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
                 // Calculo de la ModelView
                 modelMatrix     = glm::mat4(1.0f);
                 modelMatrix     = glm::translate(modelMatrix, glm::vec3(tx, ty, tz));
-                modelMatrix     = glm::rotate(modelMatrix, (float) glm::radians(ry), glm::vec3(0,1,0)); // rotaci�n alrededor del eje y en radianes
+                modelMatrix     = glm::rotate(modelMatrix, (float) glm::radians(ry), glm::vec3(0,1,0));	// Rotación alrededor del eje Y en radianes
 
                 modelViewMatrix = escena.viewMatrix * modelMatrix;
 
@@ -191,9 +196,9 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
         case EDIFICIO_ID: {
             if (escena.show_road) {
                 // Calculo de la ModelView
-                modelMatrix     = glm::mat4(1.0f); // matriz identidad
+                modelMatrix     = glm::mat4(1.0f);	// Matriz identidad
                 modelMatrix     = glm::translate(modelMatrix, glm::vec3(tx, ty, tz));
-                modelMatrix     = glm::rotate(modelMatrix, (float) glm::radians(ry), glm::vec3(0,1,0)); // rotaci�n alrededor del eje y en radianes
+                modelMatrix     = glm::rotate(modelMatrix, (float) glm::radians(ry), glm::vec3(0,1,0));	// Rotación alrededor del eje Y en radianes
                 modelMatrix     = glm::scale(modelMatrix, glm::vec3(sx, sy, sz));
 
                 modelViewMatrix = escena.viewMatrix * modelMatrix;
@@ -210,7 +215,7 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
         }
 
         case COCHE_ID: {
-            // 1. Matriz base: Coloca el coche y lo gira 180� para que mire hacia adelante en la carretera
+            // 1. Matriz base: Coloca el coche y lo gira 180 para que mire hacia adelante en la carretera
             glm::mat4 baseMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(tx, ty, tz));
             baseMatrix = glm::rotate(baseMatrix, glm::radians(180.0f + ry), glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -229,20 +234,20 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
                 glVertexAttribPointer(escena.aPositionLocation, POSITION_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo1);
                 glVertexAttribPointer(escena.aNormalLocation, NORMAL_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo1+3);
 
-                // Coordenadas locales de las ruedas. �Nota que ahora la altura Y es -0.5f para bajarlas del chasis!
+                // Coordenadas locales de las ruedas. Nota que ahora la altura Y es -0.5f para bajarlas del chasis
                 static const float rueda[4][3] = {
-                    {-0.864f, -0.5f, -1.294f}, // delantera izquierda
-                    { 0.864f, -0.5f, -1.294f}, // delantera derecha
-                    {-0.864f, -0.5f,  1.428f}, // trasera izquierda
-                    { 0.864f, -0.5f,  1.428f}  // trasera derecha
+                    {-0.864f, -0.5f, -1.294f},	// Delantera izquierda
+                    { 0.864f, -0.5f, -1.294f},	// Delantera derecha
+                    {-0.864f, -0.5f,  1.428f},	// Trasera izquierda
+                    { 0.864f, -0.5f,  1.428f}	// Trasera derecha
                 };
 
                 for (int i = 0; i < 4; i++) {
-                    // Usamos baseMatrix para que las ruedas hereden la posici�n y el giro de 180�
+                    // Usamos baseMatrix para que las ruedas hereden la posición y el giro de 180 grados
                     glm::mat4 modelMatrix = glm::translate(baseMatrix, glm::vec3(rueda[i][0], rueda[i][1], rueda[i][2]));
                     modelMatrix = glm::rotate(modelMatrix, (float) glm::radians(rr), glm::vec3(1.0f, 0.0f, 0.0f));
 
-                    if (rueda[i][0] < 0) // Ruedas del lado izquierdo: girar llanta hacia fuera
+                    if (rueda[i][0] < 0)	// Ruedas del lado izquierdo: girar llanta hacia fuera
                         modelMatrix = glm::rotate(modelMatrix, (float) glm::radians(180.0), glm::vec3(0.0f, 0.0f, 1.0f));
 
                     glm::mat4 modelViewMatrix = escena.viewMatrix * modelMatrix;
@@ -253,9 +258,9 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
             break;
         }
 
-        // Objetos estaticos de un solo modelo y un solo color.
-        // Para anadir uno nuevo: #define en Objects.h, case en el constructor
-        // (ruta del .3ds, color y posicion) y su ID en esta lista.
+        // Objetos estáticos de un solo modelo y un solo color.
+        // Para añadir uno nuevo: #define en Objects.h, case en el constructor
+        // (ruta del .3ds, color y posición) y su ID en esta lista.
         case CRUCE_ID:
         case FAROLA_ID:
         case FUENTE_ID:
@@ -264,9 +269,10 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
         case BANCO_ID:
         case SENAL_ID:
         case SEMAFORO_ID:
-        case ARBOL_ID: {
-            if (modelo0 == NULL) break;   // el .3ds no se cargo: no dibujar
-            if (tipo == CRUCE_ID && !escena.show_road) break;   // sigue el checkbox "Dibujar Carretera"
+        case ARBOL_ID:
+        case PARADA_ID: {
+            if (modelo0 == NULL) break;	// El .3ds no se cargo: no dibujar
+            if (tipo == CRUCE_ID && !escena.show_road) break;	// Sigue el checkbox "Dibujar Carretera"
 
             glUniform4fv(escena.uColorLocation, 1, (const GLfloat *) colores[0]);
             glVertexAttribPointer(escena.aPositionLocation, POSITION_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo0);
@@ -297,7 +303,7 @@ TEscena::TEscena() {
     show_wheels = 1;
     show_road = 1;
 
-    // live variables usadas por GLUI en TGui
+    // Live variables usadas por GLUI en TGui
     wireframe = 0;
     z_buffer = 1;
     culling = 0;
@@ -336,12 +342,12 @@ void __fastcall TEscena::InitGL()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
-    // Inicializacion de GLEW
+    // Inicialización de GLEW
     std::cout << "Inicializando GLEW" << std::endl << std::endl;
     if(glewInit() != GLEW_OK)
         throw std::runtime_error("glewInit failed");
 
-    // print out some info about the graphics drivers
+    // Print out some info about the graphics drivers
     std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
     std::cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
     std::cout << "Vendedor: " << glGetString(GL_VENDOR) << std::endl;
@@ -354,15 +360,15 @@ void __fastcall TEscena::InitGL()
 
     std::vector<GLuint> shaders;
     shaders.push_back(shader.LoadShader("../../Shaders/VertexShader.glsl", GL_VERTEX_SHADER));
-    //std::cout << "Vertex Shader: " << shader.ReturnShaderID() << std::endl;
+    // std::cout << "Vertex Shader: " << shader.ReturnShaderID() << std::endl;
     shaders.push_back(shader.LoadShader("../../Shaders/FragmentShader.glsl", GL_FRAGMENT_SHADER));
-    //std::cout << "Fragment Shader: " << shader.ReturnShaderID() << std::endl;
+    // std::cout << "Fragment Shader: " << shader.ReturnShaderID() << std::endl;
     shaderProgram = new Program(shaders);
 
-    //std::cout << "Shader Program: " << shaderProgram->ReturnProgramID() << std::endl;
+    // std::cout << "Shader Program: " << shaderProgram->ReturnProgramID() << std::endl;
 
     glUseProgram(shaderProgram->ReturnProgramID());
-    //glValidateProgram(shaderProgram->ReturnProgramID());
+    // glValidateProgram(shaderProgram->ReturnProgramID());
 
     aPositionLocation=shaderProgram->attrib(A_POSITION);
     aNormalLocation=shaderProgram->attrib(A_NORMAL);
@@ -388,7 +394,7 @@ void __fastcall TEscena::InitGL()
     glEnableVertexAttribArray(aPositionLocation);
     glEnableVertexAttribArray(aNormalLocation);
 
-    // Estableciendo la matriz de proyecci�n perspectiva
+    // Estableciendo la matriz de proyección perspectiva
     GLUI_Master.get_viewport_area( &tx, &ty, &tw, &th );
     xy_aspect = (float)tw / (float)th;
     projectionMatrix = glm::perspective(45.0f, xy_aspect, 0.1f, 1000.0f);
@@ -439,7 +445,7 @@ void __fastcall TEscena::RenderCars(bool reflejo) {
     }
 }
 
-/******************** TEscena::RenderCars() **********************************/
+/******************** TEscena::RenderObjects() *******************************/
 
 void __fastcall TEscena::RenderObjects(bool reflejo) {
 
@@ -457,9 +463,9 @@ void __fastcall TEscena::Render()
 
     glClearColor(0.0, 0.7, 0.9, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    // C�lculo de la vista (c�mara)
+    // Cálculo de la vista (cámara)
     viewMatrix      = glm::mat4(1.0f);
     rotateMatrix    = glm::make_mat4(view_rotate);
     viewMatrix      = glm::translate(viewMatrix,glm::vec3(view_position[0], view_position[1], view_position[2]));
@@ -467,7 +473,7 @@ void __fastcall TEscena::Render()
     viewMatrix      = glm::scale(viewMatrix,glm::vec3(scale/100.0, scale/100.0, scale/100.0));
 
     glUniform1i(uLuz0Location, gui.light0_enabled);
-    glUniformMatrix4fv(uVMatrixLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix)); // Para la luz matrix view pero sin escalado!
+    glUniformMatrix4fv(uVMatrixLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix));	// Para la luz matrix view pero sin escalado
 
     // Dibujar carretera y objetos
     RenderObjects(seleccion);
@@ -478,7 +484,7 @@ void __fastcall TEscena::Render()
     glutSwapBuffers();
 }
 
-// Selecciona un objeto a trav�s del rat�n
+// Selecciona un objeto a través del ratón
 void __fastcall TEscena::Pick3D(int mouse_x, int mouse_y)
 {
 }
@@ -521,6 +527,12 @@ static TPrimitiva *NuevoArbol(float x, float z, float giro = 0.0f) {
     a->tx = x; a->tz = z; a->ry = giro; return a;
 }
 
+// Nueva función añadida para instanciar paradas de autobús
+static TPrimitiva *NuevaParada(float x, float z, float giro = 0.0f) {
+    TPrimitiva *p = new TPrimitiva(PARADA_ID, PARADA_ID);
+    p->tx = x; p->tz = z; p->ry = giro; return p;
+}
+
 // Crea todo el escenario: un cruce central, 4 brazos de carretera (2 tramos cada uno)
 // y 4 manzanas, una en cada cuadrante.
 void __fastcall TEscena::CrearEscenario()
@@ -538,7 +550,7 @@ void __fastcall TEscena::CrearEscenario()
     cruce->sz = A / H;
     AddObject(cruce);
 
-    for (int i = 0; i < 2; i++) { // Cruz de carreteras
+    for (int i = 0; i < 2; i++) {	// Cruz de carreteras
         float c = (i == 0) ? C1 : C2;
         AddObject(NuevaCarretera( 0,  c,  0));
         AddObject(NuevaCarretera( 0, -c,  0));
@@ -547,32 +559,32 @@ void __fastcall TEscena::CrearEscenario()
     }
 
     // Suelos de las manzanas
-    AddObject(NuevoSuelo( M,  M, 32.2f, 32.2f, 0.55f, 0.55f, 0.55f)); // NE: Comercial
-    AddObject(NuevoSuelo(-M,  M, 32.2f, 32.2f, 0.55f, 0.55f, 0.55f)); // NW: Comercial
-    AddObject(NuevoSuelo( M, -M, 32.2f, 32.2f, 0.70f, 0.65f, 0.60f)); // SE: Plaza
-    AddObject(NuevoSuelo(-M, -M, 32.2f, 32.2f, 0.20f, 0.40f, 0.20f)); // SW: Parque
+    AddObject(NuevoSuelo( M,  M, 32.2f, 32.2f, 0.55f, 0.55f, 0.55f));	// NE: Comercial
+    AddObject(NuevoSuelo(-M,  M, 32.2f, 32.2f, 0.55f, 0.55f, 0.55f));	// NW: Comercial
+    AddObject(NuevoSuelo( M, -M, 32.2f, 32.2f, 0.70f, 0.65f, 0.60f));	// SE: Plaza
+    AddObject(NuevoSuelo(-M, -M, 32.2f, 32.2f, 0.20f, 0.40f, 0.20f));	// SW: Parque
 
     // 2. REGULACIÓN DE TRÁFICO (Conducción por la derecha) ====================
     // Semáforos en las líneas de detención
-    AddObject(NuevoSemaforo( F, -F, 180.0f));  // Tráfico Sur -> Norte
-    AddObject(NuevoSemaforo(-F,  F,   0.0f));  // Tráfico Norte -> Sur
-    AddObject(NuevoSemaforo(-F, -F, -90.0f));  // Tráfico Oeste -> Este
-    AddObject(NuevoSemaforo( F,  F,  90.0f));  // Tráfico Este -> Oeste
+    AddObject(NuevoSemaforo( F, -F, 180.0f));	// Tráfico Sur -> Norte
+    AddObject(NuevoSemaforo(-F,  F,   0.0f));	// Tráfico Norte -> Sur
+    AddObject(NuevoSemaforo(-F, -F, -90.0f));	// Tráfico Oeste -> Este
+    AddObject(NuevoSemaforo( F,  F,  90.0f));	// Tráfico Este -> Oeste
 
     // Señales verticales avisando antes del cruce (a 12 metros)
-    AddObject(NuevaSenal( F, -12.0f, 180.0f)); // Acera derecha, mirando al Sur
-    AddObject(NuevaSenal(-F,  12.0f,   0.0f)); // Acera derecha, mirando al Norte
-    AddObject(NuevaSenal(-12.0f, -F, -90.0f)); // Acera derecha, mirando al Oeste
-    AddObject(NuevaSenal( 12.0f,  F,  90.0f)); // Acera derecha, mirando al Este
+    AddObject(NuevaSenal( F, -12.0f, 180.0f));	// Acera derecha, mirando al Sur
+    AddObject(NuevaSenal(-F,  12.0f,   0.0f));	// Acera derecha, mirando al Norte
+    AddObject(NuevaSenal(-12.0f, -F, -90.0f));	// Acera derecha, mirando al Oeste
+    AddObject(NuevaSenal( 12.0f,  F,  90.0f));	// Acera derecha, mirando al Este
 
     // Farolas (distribuidas a lo largo de las calles, evitando el cruce exacto)
     float posFarolas[] = { 10.0f, 18.0f, 26.0f };
     for (int i = 0; i < 3; i++) {
         float p = posFarolas[i];
-        AddObject(NuevaFarola( F,  p)); AddObject(NuevaFarola(-F,  p)); // Calle Norte
-        AddObject(NuevaFarola( F, -p)); AddObject(NuevaFarola(-F, -p)); // Calle Sur
-        AddObject(NuevaFarola( p,  F)); AddObject(NuevaFarola( p, -F)); // Calle Este
-        AddObject(NuevaFarola(-p,  F)); AddObject(NuevaFarola(-p, -F)); // Calle Oeste
+        AddObject(NuevaFarola( F,  p)); AddObject(NuevaFarola(-F,  p));	// Calle Norte
+        AddObject(NuevaFarola( F, -p)); AddObject(NuevaFarola(-F, -p));	// Calle Sur
+        AddObject(NuevaFarola( p,  F)); AddObject(NuevaFarola( p, -F));	// Calle Este
+        AddObject(NuevaFarola(-p,  F)); AddObject(NuevaFarola(-p, -F));	// Calle Oeste
     }
 
     // 3. EDIFICIOS Y ACERAS COMERCIALES (Norte) ===============================
@@ -590,18 +602,27 @@ void __fastcall TEscena::CrearEscenario()
     AddObject(edificio2);
     AddObject(NuevaPapelera(-M + 1.5f, 5.0f));
 
-    // 4. PLAZA DE LA FUENTE (Sureste) =========================================
+    // 4. PLAZA DE LA FUENTE Y PARADAS DE BUS (Sureste) ========================
     TPrimitiva *fuente = new TPrimitiva(FUENTE_ID, FUENTE_ID);
-    fuente->tx = M; fuente->tz = -M; // Centro exacto de la manzana
+    fuente->tx = M; fuente->tz = -M;	// Centro exacto de la manzana
     AddObject(fuente);
 
     // Cuatro bancos en cuadrado rodeando la fuente y mirando hacia el centro:
-    AddObject(NuevoBanco(M,        -M + 8.5f, -90.0f)); // Banco Norte (asiento hacia el Sur)
-    AddObject(NuevoBanco(M,        -M - 8.5f,   90.0f)); // Banco Sur (asiento hacia el Norte)
-    AddObject(NuevoBanco(M - 8.5f, -M,         180.0f)); // Banco Oeste (asiento hacia el Este)
-    AddObject(NuevoBanco(M + 8.5f, -M,        0.0f)); // Banco Este (asiento hacia el Oeste)
+    AddObject(NuevoBanco(M,        -M + 8.5f, -90.0f));	// Banco Norte (asiento hacia el Sur)
+    AddObject(NuevoBanco(M,        -M - 8.5f,   90.0f));	// Banco Sur (asiento hacia el Norte)
+    AddObject(NuevoBanco(M - 8.5f, -M,         180.0f));	// Banco Oeste (asiento hacia el Este)
+    AddObject(NuevoBanco(M + 8.5f, -M,        0.0f));	// Banco Este (asiento hacia el Oeste)
 
-    AddObject(NuevaPapelera(M + 3.0f, -M + 8.5f)); // Papelera pegada al banco Norte
+    AddObject(NuevaPapelera(M + 3.0f, -M + 8.5f));	// Papelera pegada al banco Norte
+    
+    // Árboles rodeando la fuente en las esquinas de la plaza
+    AddObject(NuevoArbol(M + 12.0f, -M + 12.0f));
+    AddObject(NuevoArbol(M - 12.0f, -M + 12.0f));
+    AddObject(NuevoArbol(M + 12.0f, -M - 12.0f));
+    AddObject(NuevoArbol(M - 12.0f, -M - 12.0f));
+    
+    // Paradas de autobús en las aceras colindantes a la fuente
+    AddObject(NuevaParada(F, -M, 180.0f));	// Parada junto a la fuente en acera Sur->Norte
 
     // 5. PARQUE DEPORTIVO (Suroeste) ==========================================
     TPrimitiva *pista = new TPrimitiva(PISTA_ID, PISTA_ID);
@@ -613,16 +634,16 @@ void __fastcall TEscena::CrearEscenario()
     AddObject(NuevaPapelera(-M + 6.5f, -9.0f));
 
     // Árboles en el parque deportivo
-    AddObject(NuevoArbol(-M - 12.0f, -M + 12.0f)); // Esquina superior izquierda del parque
-    AddObject(NuevoArbol(-M + 12.0f, -M + 12.0f)); // Esquina superior derecha del parque
-    AddObject(NuevoArbol(-M - 12.0f, -M - 12.0f)); // Esquina inferior izquierda del parque
-    AddObject(NuevoArbol(-M + 12.0f, -M - 12.0f)); // Esquina inferior derecha del parque
+    AddObject(NuevoArbol(-M - 12.0f, -M + 12.0f));	// Esquina superior izquierda del parque
+    AddObject(NuevoArbol(-M + 12.0f, -M + 12.0f));	// Esquina superior derecha del parque
+    AddObject(NuevoArbol(-M - 12.0f, -M - 12.0f));	// Esquina inferior izquierda del parque
+    AddObject(NuevoArbol(-M + 12.0f, -M - 12.0f));	// Esquina inferior derecha del parque
 
     // 6. COCHES ===============================================================
     // Coche 1 (Naranja): Viene del Sur, va hacia el Norte (Carril derecho, +X)
     TPrimitiva *car1 = new TPrimitiva(1, COCHE_ID);
     car1->tx = A / 2.0f;
-    car1->tz = -C1 - 5.0f; // Detrás de la línea del semáforo
+    car1->tz = -C1 - 5.0f;	// Detrás de la línea del semáforo
     car1->ry = 0.0f;       // Mirando hacia el Norte (+Z)
 
     // Coche 2 (Azul): Viene del Este, va hacia el Oeste (Carril derecho, +Z)
@@ -658,7 +679,7 @@ void controlCallback(int control)
 void __fastcall TGui::Init(int main_window) {
 
     /****************************************************/
-    /*        C�digo con el interfaz Gr�fico GLUI       */
+    /*        Código con el interfaz Gráfico GLUI       */
     /****************************************************/
     printf( "GLUI version: %3.2f\n", GLUI_Master.get_version() );
 
@@ -667,10 +688,10 @@ void __fastcall TGui::Init(int main_window) {
     /*** Crea a ventana lateral ***/
     glui = GLUI_Master.create_glui_subwindow( window_id, GLUI_SUBWINDOW_RIGHT );
 
-    // A�ade una separaci�n
+    // Añade una separación
     new GLUI_StaticText( glui, "" );
 
-    // A�ade un panel con texto con el valor de la selecci�n
+    // Añade un panel con texto con el valor de la selección
     GLUI_Panel *panel0 = new GLUI_Panel(glui, "Seleccion");
     GLUI_RadioGroup *radioGroup = new GLUI_RadioGroup(panel0, &sel, SEL_ID, controlCallback);
     glui->add_radiobutton_to_group(radioGroup, "NINGUNO");
@@ -680,7 +701,7 @@ void __fastcall TGui::Init(int main_window) {
     glui->add_radiobutton_to_group(radioGroup, "COCHE 2");
 
 
-    // A�ade una separaci�n
+    // Añade una separación
     new GLUI_StaticText( glui, "" );
 
     obj_panel = new GLUI_Rollout(glui, "Propiedades", true );
@@ -692,9 +713,9 @@ void __fastcall TGui::Init(int main_window) {
     new GLUI_Checkbox( obj_panel, "Culling", &escena.culling, 1, controlCallback );
     new GLUI_Checkbox( obj_panel, "Z Buffer", &escena.z_buffer, 1, controlCallback );
 
-    /******** A�ade controles para las luces ********/
+    /******** Añade controles para las luces ********/
 
-    // A�ade una separaci�n
+    // Añade una separación
     new GLUI_StaticText( glui, "" );
 
     GLUI_Rollout *roll_lights = new GLUI_Rollout(glui, "Luces", true );
@@ -732,7 +753,7 @@ void __fastcall TGui::Init(int main_window) {
     sb->set_float_limits(-100,100);
 
 
-    // A�ade una separaci�n
+    // Añade una separación
     new GLUI_StaticText( glui, "" );
 
     /***  Rollout de Opciones ***/
@@ -743,30 +764,30 @@ void __fastcall TGui::Init(int main_window) {
 
 
     /*** Disable/Enable botones ***/
-    // A�ade una separaci�n
+    // Añade una separación
     new GLUI_StaticText( glui, "" );
     new GLUI_Checkbox( glui, "Permitir Movimiento", &enable_panel2 );
-    // A�ade una separaci�n
+    // Añade una separación
     new GLUI_StaticText( glui, "" );
     new GLUI_Button( glui, "Resetear Posicion", RESET_ID, controlCallback );
 
-    // A�ade una separaci�n
+    // Añade una separación
     new GLUI_StaticText( glui, "" );
 
     new GLUI_Separator( glui );
 
-     // A�ade una separaci�n
+     // Añade una separación
     new GLUI_StaticText( glui, "" );
 
     new GLUI_StaticText( glui, "  Autor:" );
     new GLUI_StaticText( glui, "  2012-2022 (C) Juan Antonio Puchol  " );
 
-    // A�ade una separaci�n
+    // Añade una separación
     new GLUI_StaticText( glui, "" );
 
     new GLUI_Separator( glui );
 
-    // A�ade una separaci�n
+    // Añade una separación
     new GLUI_StaticText( glui, "" );
 
     /****** A 'quit' button *****/
@@ -853,7 +874,7 @@ void __fastcall TGui::ControlCallback( int control )
         }
         case SEL_ID: {
             escena.seleccion = sel;
-            //GLUI_Master.SetFocus(true);
+            // GLUI_Master.SetFocus(true);
             glutSetWindow( glui->get_glut_window_id() );
             break;
         }
@@ -889,14 +910,14 @@ void __fastcall TGui::Reshape( int xx, int yy )
     GLUI_Master.get_viewport_area( &x, &y, &ancho, &alto );
     glViewport( x, y, ancho, alto );
 
-    // !!!!! ATENCI�N: comprobar que alto no sea 0, sino divisi�n por 0 !!!!!
-    if (alto <= 0 || ancho <= 0) return; // Evita que explote al minimizar o cerrar
+    // !!!!! ATENCIÓN: comprobar que alto no sea 0, sino división por 0 !!!!!
+    if (alto <= 0 || ancho <= 0) return;	// Evita que explote al minimizar o cerrar
 
     escena.xy_aspect = (float)ancho / (float)alto;
     escena.projectionMatrix = glm::perspective(45.0f, escena.xy_aspect, 0.1f, 1000.0f);
     glUniformMatrix4fv(escena.uProjectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(escena.projectionMatrix));
 
-    //std::cout << "xy aspect: " << escena.xy_aspect << std::endl;
+    // std::cout << "xy aspect: " << escena.xy_aspect << std::endl;
 
     glutPostRedisplay();
 }
@@ -914,4 +935,3 @@ void __fastcall TGui::Mouse(int button, int button_state, int x, int y )
 {
     escena.Pick3D(x, y);
 }
-
