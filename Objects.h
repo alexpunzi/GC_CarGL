@@ -40,6 +40,7 @@
 #define SEMAFORO_ID     100
 #define ARBOL_ID        110
 #define PARADA_ID       120
+#define QUISCO_ID       130
 
 #define COCHE_ID	    500
 
